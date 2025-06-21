@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網站滲透教學素材</title>
+    <link rel="icon" href="icon.ico" type="image/x-icon">
+    
+    <!-- Google Fonts: Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* CSS 樣式表 */
+
+        /* --- 1. 全域與基本設定 --- */
+        :root {
+            --primary-color: #1a9baf;
+            --primary-light: #5dbed6;
+            --primary-lighter: #9dcad4;
+            --primary-dark: #0f7a8c;
+            --text-light: #ffffff;
+            --text-dark: #0c5663;
+            --text-body: #333333;
+            --bg-light: #f0f8ff;
+            --accent-red: #d9534f;
+            --example-bg: #a9c8e3;
+            --example-border: #0060d6;
+            --code-bg: #2d2d2d;
+            --ctf-box-bg: #c3d7f4;
+            --ctf-box-border: #0051ff;
+        }
+
+        /* 註解：重置預設樣式並設定基本排版 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            font-family: 'Noto Sans TC', sans-serif;
+            line-height: 1.8;
+            background-color: var(--bg-light);
+            color: var(--text-body);
+            scroll-behavior: smooth;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+        }
+
+        a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--primary-light);
+        }
+
+        ul {
+            list-style-type:none;
+        }
+
+        ol {
+            list-style-type:none;
+        }
+
+        /* --- 2. 頁首 (Header) --- */
+        .site-header {
+            height: 10vh; /* 依照規範設定為 10% */
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            flex-shrink: 0;
+        }
+
+        .site-header .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .site-header .credits {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--primary-lighter);
+        }
+
+        .site-header .github-icon {
+            font-size: 1.8rem;
+            color: var(--text-light);
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .site-header .github-icon:hover {
+            transform: scale(1.1);
+            color: var(--primary-lighter);
+        }
+
+        /* --- 3. 主要內容區塊 (Content Area) --- */
+        .content-wrapper {
+            display: flex;
+            flex-grow: 1;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        /* 左側導航欄 (Nav) */
+        .side-nav {
+            width: 20%;
+            flex-shrink: 0;
+            background-color: var(--primary-lighter);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* 陰影微調以符合淺色背景 */
+            padding: 1rem;
+            align-self: flex-start; /* 確保起始位置對齊 */
+            /* 註解：高度由 JavaScript 控制，此處移除 transition 以符合規範 */
+        }
+
+        .side-nav ul {
+            list-style: none;
+        }
+
+        .side-nav ul li a {
+            display: block;
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .side-nav ul li a:hover {
+            background-color: var(--primary-light);
+            color: var(--text-light);
+        }
+
+        .side-nav ul li a.active {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 700;
+        }
+        
+        /* 右側主內容 (Main) */
+        main {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .page {
+            display: none; /* 預設隱藏所有頁面 */
+            background-color: var(--text-light);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            min-height: 65vh;
+        }
+
+        .page.active {
+            display: block; /* 僅顯示 active 的頁面 */
+        }
+        
+        .page-title {
+            font-size: 2.2rem;
+            border-bottom: 3px solid var(--primary-lighter);
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* --- 4. 特定頁面與元件樣式 --- */
+        
+        /* 首頁 */
+        #home .home-content-box {
+            max-width: 90%; /* 讓內容有呼吸空間 */
+            margin: 0 auto;
+        }
+        #home .yt-video {
+            float: right;
+            margin: 0 0 1rem 2rem;
+            width: 40%; /* 依照規範設定 */
+            aspect-ratio: 16 / 9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #home .home-intro-img {
+            display: block;
+            max-width: 80%;
+            margin: 1rem auto 2rem;
+            border: 1px solid var(--primary-lighter);
+            border-radius: 8px;
+        }
+        .start-button-wrapper {
+            text-align: center;
+            margin-top: 2rem;
+            clear: both; /* 避免受 float 影響 */
+        }
+        .start-button {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 0.8rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .start-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* 內部分頁 (Tabs) */
+        .tabs-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-lighter);
+        }
+        .tab-button {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            border-radius: 12px 12px 0 0; /* 圓角效果 */
+            transition: all 0.3s ease;
+        }
+        .tab-button:hover {
+            background-color: var(--primary-lighter);
+            color: var(--text-dark);
+        }
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 700;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 圖文排版 */
+        .image-text-layout {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .image-text-layout img {
+            max-width: 35%;
+            flex-shrink: 0;
+            border-radius: 8px;
+        }
+
+        /* 關鍵術語 Tooltip */
+        .tooltip {
+            border-bottom: 2px dotted var(--primary-color);
+            cursor: help;
+            position: relative;
+            font-weight: 700;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 220px;
+            background-color: var(--text-dark);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-weight: 400;
+            font-size: 0.9rem;
+        }
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--text-dark) transparent transparent transparent;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* 強調文字 */
+        .emphasis {
+            font-weight: 700;
+            color: var(--accent-red);
+        }
+        
+        /* 範例區塊 */
+        .example-block {
+            background-color: var(--example-bg);
+            border-left: 5px solid var(--example-border);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* 程式碼區塊 */
+        pre {
+            background-color: var(--code-bg);
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.95rem;
+        }
+        code {
+            background-color: var(--code-bg);
+            font-family: 'Roboto Mono', monospace;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            color: #8ad890;
+        }
+
+        /* CTF 題目頁面 */
+        #ctf-challenge .ctf-box {
+            border: 2px dashed var(--ctf-box-border);
+            background-color: var(--ctf-box-bg);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            max-width: 80%;
+            margin: 5rem auto;
+        }
+        #ctf-challenge .ctf-box p {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            color: var(--text-dark);
+            font-weight: 500;
+            margin-bottom: 2rem;
+        }
+        #ctf-challenge .ctf-command {
+            display: block;
+            font-size: 1.2rem;
+            color: var(--ctf-box-border);
+            font-family: 'Roboto Mono', monospace;
+            background-color: rgba(255,255,255,0.5);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        #ctf-challenge .ctf-note {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 2rem;
+        }
+
+        /* CTF 題目講解 (Write-Up) */
+        #writeup .steps-navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.8rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+        }
+        #writeup .step-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-lighter);
+            background-color: var(--text-light);
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #writeup .step-button:hover {
+            background-color: var(--primary-lighter);
+            border-color: var(--primary-color);
+        }
+        #writeup .step-button.active {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border-color: var(--primary-dark);
+        }
+        
+        /* 延伸閱讀 */
+        #reading .reading-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        #reading .reading-card {
+            border: 1px solid var(--primary-lighter);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        #reading .reading-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        #reading .reading-card h3 {
+            color: var(--primary-dark);
+            margin-top: 0;
+        }
+
+        /* 換頁按鈕 */
+        .page-nav-buttons {
+            position: fixed;
+            bottom: 4rem;
+            right: 4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+        .page-nav-button {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .page-nav-button:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.1);
+        }
+        
+        /* --- 5. 頁尾 (Footer) --- */
+        .site-footer {
+            height: 15vh; /* 依照規範設定為 15% */
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex-shrink: 0;
+            line-height: 1.6;
+            padding: 1rem;
+        }
+        .site-footer a {
+            color: var(--primary-lighter);
+        }
+        .site-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- 6. 響應式設計 (RWD) --- */
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            .side-nav {
+                width: 100%;
+                height: auto !important; /* 在手機版取消 JS 高度控制 */
+                align-self: initial;
+            }
+            .side-nav ul {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .page-nav-buttons {
+                bottom: 2rem;
+                right: 2rem;
+            }
+            #reading .reading-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .image-text-layout {
+                flex-direction: column;
+            }
+            .image-text-layout img {
+                max-width: 60%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .site-header {
+                flex-direction: column;
+                height: auto;
+                padding: 1rem;
+                text-align: center;
+            }
+            .site-header .credits {
+                margin-top: 0.5rem;
+            }
+            .page {
+                padding: 1.5rem;
+            }
+            #home .yt-video {
+                float: none;
+                width: 100%;
+                margin: 1rem 0;
+            }
+            #reading .reading-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 頁首區塊 -->
+    <header class="site-header">
+        <div class="logo">網站滲透教學素材</div>
+        <div class="credits">
+            <span>臺北市數位實驗高中學生製作的教學素材！</span>
+            <a href="https://github.com/tschool-ctf/Web-Security_Learning_Resource" target="_blank" rel="noopener noreferrer" class="github-icon" aria-label="GitHub Repository">
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- 內容區塊 -->
+    <div class="content-wrapper">
+        <!-- 左側導航欄 -->
+        <nav class="side-nav" id="side-nav">
+            <ul>
+                <!-- 註解：首頁連結在JS中特別處理，使其能顯示/隱藏導航欄 -->
+                <li><a href="#home" data-page="home"><i class="fas fa-home"></i> 首頁</a></li>
+                <li><a href="#intro" data-page="intro"><i class="fas fa-book-open"></i> 網站滲透介紹</a></li>
+                <li><a href="#types" data-page="types"><i class="fas fa-sitemap"></i> 網站滲透手法種類</a></li>
+                <li><a href="#application" data-page="application"><i class="fas fa-bullseye"></i> 網站滲透應用舉例</a></li>
+                <li><a href="#ctf-challenge" data-page="ctf-challenge"><i class="fas fa-gamepad"></i> 網站滲透題目</a></li>
+                <li><a href="#writeup" data-page="writeup"><i class="fas fa-pen-to-square"></i> 網站滲透題目講解</a></li>
+                <li><a href="#reading" data-page="reading"><i class="fas fa-book-reader"></i> 延伸閱讀</a></li>
+            </ul>
+        </nav>
+
+        <!-- 右側主要內容 -->
+        <main id="main-content">
+            
+            <!-- 分頁1: 首頁 -->
+            <section id="home" class="page">
+                <div class="home-content-box">
+                    <h1 class="page-title">網站滲透</h1>
+                    <div class="yt-video">
+                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <p>歡迎來到網站滲透教學素材包！本系列旨在為對資訊安全有興趣的初學者（特別是國中至高中生）提供一個清晰、結構化的學習起點。</p>
+                    <p>在這裡，你不需要具備高深的技術背景，我們將用最直接、易懂的方式，帶你認識網站滲透的核心概念、常見手法與基本流程。準備好踏入白帽駭客的世界，學習如何保護網路安全了嗎？</p>
+                    
+                    <img src="images/intro.png" alt="教學素材架構圖" class="home-intro-img">
+                    <div class="start-button-wrapper">
+                        <button class="start-button" id="start-learning-btn">開始學習</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 分頁2: 網站滲透介紹 -->
+            <section id="intro" class="page">
+                <h1 class="page-title">網站滲透介紹</h1>
+                <div class="tabs-container" id="intro-tabs">
+                    <button class="tab-button active" data-tab="1">何謂網路安全</button>
+                    <button class="tab-button" data-tab="2">何謂網站滲透</button>
+                    <button class="tab-button" data-tab="3">常見滲透流程</button>
+                </div>
+
+                <div id="intro-tab-1" class="tab-content active">
+                    <h3>何謂網路安全 (Cybersecurity)</h3>
+                    <div class="image-text-layout">
+                        <img src="images/CIA.png" alt="網路安全示意圖">
+                        <div>
+                            <p>網路安全，或稱資訊安全 (Information Security)，是指保護電腦系統、網路、程式與資料，免於遭受未經授權的存取、攻擊、損壞或洩漏的一系列技術與實踐。</p>
+                            <p>它的目標是確保資訊的三個核心要素，稱為 <span class="tooltip">CIA Triad<span class="tooltip-text">機密性 (Confidentiality)、完整性 (Integrity)、可用性 (Availability) 的縮寫，是資訊安全的基石。</span></span>：</p>
+                            <ul>
+                                <li><b>機密性 (Confidentiality):</b> 確保資料只被授權的使用者存取。</li>
+                                <li><b>完整性 (Integrity):</b> 確保資料在儲存或傳輸過程中，沒有被未經授權地修改。</li>
+                                <li><b>可用性 (Availability):</b> 確保授權使用者在需要時，能夠順利存取資料與使用服務。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="intro-tab-2" class="tab-content">
+                    <h3>何謂網站滲透測試 (Web Penetration Testing)</h3>
+                    <div class="image-text-layout">
+                        <img src="images/Penetration_Testing1.png" alt="網路安全示意圖">
+                        <div>
+                            <p>網站滲透測試是一種<span class="emphasis">經過授權</span>的模擬攻擊，目的是為了評估一個網站應用程式的安全性。執行滲透測試的專家（稱為滲透測試人員或白帽駭客）會使用與惡意攻擊者相同的工具和技術，來尋找並利用系統中的安全漏洞。</p>
+                            <p>這麼做的主要目的並非造成破壞，而是：</p>
+                            <ul>
+                                <li><b>識別安全漏洞：</b>在真正的攻擊者發現它們之前，找出系統的弱點。</li>
+                                <li><b>評估漏洞風險：</b>分析漏洞可能造成的業務衝擊與損害程度。</li>
+                                <li><b>提供修補建議：</b>向開發團隊提出具體的修復方案，以強化整體安全性。</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="example-block">
+                        <b>舉例來說：</b>想像你的網站是一棟房子。滲透測試就像是屋主聘請一位鎖匠，請他嘗試用各種方法（如撬鎖、爬窗）進入房子，然後告訴屋主哪些門窗不夠堅固、需要更換。
+                    </div>
+                </div>
+                <div id="intro-tab-3" class="tab-content">
+                    <h3>常見網站滲透流程</h3>
+                    <div class="image-text-layout">
+                        <img src="images/Penetration_Testing2.png" alt="網路安全示意圖">
+                        <div>
+                            <p>一個標準的網站滲透測試通常會遵循以下幾個階段，這有助於系統化地找出潛在風險。</p>
+                            <ol>
+                                <li><b>偵察 (Reconnaissance):</b> 這是資訊收集階段。測試人員會盡可能地收集目標網站的公開資訊，例如：使用的技術框架、伺服器類型、子網域、開發人員聯絡方式等。</li>
+                                <li><b>掃描 (Scanning):</b> 使用自動化工具掃描目標網站，以尋找已知的漏洞、開放的通訊埠 (Ports) 或不安全的服務配置。</li>
+                                <li><b>獲取存取權 (Gaining Access):</b> 在這個階段，測試人員會嘗試利用前兩階段發現的漏洞來攻擊系統。例如，透過 <span class="tooltip">SQL Injection<span class="tooltip-text">一種攻擊手法，攻擊者將惡意的SQL語法注入到網站的輸入欄位中，以欺騙資料庫執行非預期的指令。</span></span> 來控制資料庫。</li>
+                                <li><b>維持存取權 (Maintaining Access):</b> 成功滲透後，測試人員可能會嘗試安裝後門 (Backdoor) 或提升權限，以模擬長期潛伏的攻擊者，確認系統是否能偵測到這類行為。</li>
+                                <li><b>清除痕跡 (Covering Tracks) 與產出報告 (Reporting):</b> 測試結束後，移除所有測試過程中留下的檔案或修改，並撰寫一份詳細的報告，說明發現的漏洞、風險等級與修補建議。</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 分頁3: 網站滲透手法種類 -->
+            <section id="types" class="page">
+                <h1 class="page-title">網站滲透手法種類說明</h1>
+                <p>網站的滲透手法有很多，這裡只舉了幾個簡單的例子說明。</p>
+                 <div class="tabs-container" id="types-tabs">
+                    <button class="tab-button active" data-tab="1">XSS 跨站腳本攻擊</button>
+                    <button class="tab-button" data-tab="2">檔案上傳漏洞</button>
+                    <a href="https://tschool-ctf.github.io/SQL-Injection_Learning_Resource/"><button class="tab-button">SQL Injection（外部連結）</button></a>
+                </div>
+                
+                <div id="types-tab-1" class="tab-content active">
+                    <h3>Cross-Site Scripting (XSS, 跨站腳本攻擊)</h3>
+                     <div class="image-text-layout">
+                        <img src="images/XSS.png" alt="XSS 攻擊流程示意圖">
+                        <div>
+                           <p>XSS 是一種客戶端 (Client-side) 的攻擊手法。攻擊者將惡意的 JavaScript 腳本注入到一個可信的網站中，當其他使用者瀏覽該頁面時，這段惡意腳本就會在使用者的瀏覽器上執行。</p>
+                            <p>與 SQL Injection 攻擊伺服器不同，XSS 的主要目標是<span class="emphasis">網站的其他使用者</span>。</p>
+                            <b>常見類型：</b>
+                            <ul>
+                                <li><b>儲存型 XSS (Stored XSS):</b> 惡意腳本被儲存在網站的資料庫中（例如：留言板、使用者個人資料）。每當有使用者瀏覽到含有此腳本的頁面時，就會觸發攻擊。</li>
+                                <li><b>反射型 XSS (Reflected XSS):</b> 惡意腳本包含在一個 URL 連結中。攻擊者需要誘騙受害者點擊這個連結，腳本才會在受害者的瀏覽器上執行。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="types-tab-2" class="tab-content">
+                    <h3>檔案上傳漏洞 (File Upload Vulnerability)</h3>
+                    <p>許多網站提供檔案上傳功能，例如更換頭像、上傳附件等。如果網站沒有對上傳的檔案類型、大小、內容做嚴格的檢查，攻擊者就可能上傳惡意的檔案，例如一個<span class="tooltip">Web Shell<span class="tooltip-text">一個網頁形式的後門程式，攻擊者可以透過瀏覽器遠端執行伺服器上的指令，完全控制網站。</span></span>。</p>
+                    <b>攻擊流程：</b>
+                    <ol>
+                        <li>攻擊者找到網站的檔案上傳功能。</li>
+                        <li>攻擊者製作一個偽裝成圖片檔（如：`shell.jpg.php`）但實際上是 PHP 程式的 Web Shell。</li>
+                        <li>網站後端檢查機制可能只檢查了副檔名的一部分 (如 `.jpg`)，或根本沒有檢查，因而允許檔案上傳。</li>
+                        <li>攻擊者找到上傳後檔案的 URL 路徑（如 `uploads/shell.jpg.php`）。</li>
+                        <li>透過瀏覽器訪問該 URL，伺服器會將其當作 PHP 程式執行，攻擊者便取得了網站伺服器的控制權。</li>
+                    </ol>
+                </div>
+            </section>
+            
+            <!-- 分頁4: 網站滲透應用舉例 -->
+            <section id="application" class="page">
+                <h1 class="page-title">網站滲透應用舉例</h1>
+                <p>了解攻擊手法後，我們來看看惡意攻擊者（駭客）會如何利用這些漏洞來達成他們的目的。</p>
+                 <div class="tabs-container" id="application-tabs">
+                    <button class="tab-button active" data-tab="1">竊取敏感資料</button>
+                    <button class="tab-button" data-tab="2">癱瘓服務 (DoS)</button>
+                    <button class="tab-button" data-tab="3">散播惡意軟體</button>
+                </div>
+
+                <div id="application-tab-1" class="tab-content active">
+                    <h3>目的：竊取敏感資料</h3>
+                    <p>這是最常見的攻擊目的之一。駭客的目標是獲取高價值的敏感資訊。</p>
+                    <ul>
+                        <li><b>使用手法：</b><code class="emphasis">SQL Injection</code></li>
+                        <li><b>攻擊目標：</b>儲存使用者資料的資料庫。</li>
+                        <li><b>可能結果：</b>
+                            <ul>
+                                <li>竊取所有使用者的帳號、密碼、電子郵件、電話號碼、信用卡資訊等。</li>
+                                <li>將竊得的資料在黑市販售牟利。</li>
+                                <li>利用這些資料進行進一步的詐騙或身分盜用。</li>
+                            </ul>
+                        </li>
+                    </ul>
+                     <div class="example-block">
+                        <b>真實世界案例：</b>許多大型企業都曾因 SQL Injection 漏洞導致大量用戶資料外洩，造成巨大的商譽與金錢損失。
+                    </div>
+                </div>
+                <div id="application-tab-2" class="tab-content">
+                    <h3>目的：癱瘓服務 (Denial of Service)</h3>
+                    <p>有時駭客的目的不是偷東西，而是讓網站無法正常運作，對企業造成營運中斷的損失。</p>
+                    <ul>
+                        <li><b>使用手法：</b>複雜的 <code class="emphasis">SQL Injection</code> 或其他消耗資源的漏洞。</li>
+                        <li><b>攻擊目標：</b>網站伺服器或資料庫伺服器的運算資源 (CPU, Memory)。</li>
+                        <li><b>可能結果：</b>
+                            <ul>
+                                <li>執行一個極度複雜或需要大量運算的查詢，使資料庫伺服器資源耗盡，無法回應正常請求。</li>
+                                <li>導致網站變慢，甚至完全崩潰，所有使用者都無法訪問。</li>
+                                <li>這種攻擊有時是為了勒索，或作為更大規模攻擊的聲東擊西手段。</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div id="application-tab-3" class="tab-content">
+                     <h3>目的：散播惡意軟體或釣魚</h3>
+                    <p>駭客可以利用受信任的網站作為跳板，來攻擊該網站的使用者。</p>
+                    <ul>
+                        <li><b>使用手法：</b><code class="emphasis">Cross-Site Scripting (XSS)</code> 或 <code class="emphasis">檔案上傳漏洞</code></li>
+                        <li><b>攻擊目標：</b>瀏覽該網站的普通使用者。</li>
+                        <li><b>可能結果：</b>
+                            <ul>
+                                <li><b>(XSS)</b> 在頁面中插入一個假的登入框，竊取使用者的帳號密碼（釣魚）。</li>
+                                <li><b>(XSS)</b> 將使用者重新導向到一個惡意網站，誘騙其下載病毒或勒索軟體。</li>
+                                <li><b>(檔案上傳)</b> 將惡意檔案上傳至伺服器，並將連結散播出去，讓其他使用者下載中毒。</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- 分頁5: CTF 題目 -->
+            <section id="ctf-challenge" class="page">
+                 <div class="ctf-box">
+                    <p>準備好挑戰了嗎？<br>在你的終端機（或 CMD）輸入以下指令，<br>前往 CTF 練習平台開始解題！</p>
+                    <span class="ctf-command">docker pull masonzeng/prompt-injection_learning_resource:tsctf_pi_v1</span>
+                    <span class="ctf-command">docker run masonzeng/prompt-injection_learning_resource:tsctf_pi_v1</span>
+                    <p class="ctf-note">這是一串 Docker 指令，輸入後會下載並執行一個包含挑戰題目的網站映像檔。執行後，請在瀏覽器開啟 url 開始挑戰！</p>
+                </div>
+            </section>
+            
+            <!-- 分頁6: CTF 題目講解 -->
+            <section id="writeup" class="page">
+                <h1 class="page-title">網站滲透題目講解 (Write-Up)</h1>
+                
+                <div id="writeup-steps-content">
+                    <!-- 步驟內容將由 JS 動態生成 -->
+                </div>
+
+                <div class="steps-navigation" id="writeup-steps-nav">
+                    <!-- 步驟按鈕將由 JS 動態生成 -->
+                </div>
+            </section>
+            
+            <!-- 分頁7: 延伸閱讀 -->
+            <section id="reading" class="page">
+                <h1 class="page-title">延伸閱讀</h1>
+                <div class="reading-grid">
+                    <a href="#" class="reading-card">
+                        <h3>OWASP Top 10</h3>
+                        <p>了解全球公認最關鍵的十大網站應用程式安全風險，這是每位網站安全學習者的必讀清單。</p>
+                    </a>
+                    <a href="#" class="reading-card">
+                        <h3>PortSwigger Web Security Academy</h3>
+                        <p>一個免費的線上學習平台，提供大量高品質的網站安全實驗室，讓你親手練習各種攻擊手法。</p>
+                    </a>
+                    <a href="#" class="reading-card">
+                        <h3>Hack The Box</h3>
+                        <p>一個知名的線上滲透測試練習平台，提供各種難度的虛擬靶機，讓你挑戰真實世界的攻防場景。</p>
+                    </a>
+                    <a href="#" class="reading-card">
+                        <h3>CTFtime</h3>
+                        <p>追蹤全球 CTF (Capture The Flag) 賽事的網站，你可以在這裡找到即將舉行的比賽並組隊參加。</p>
+                    </a>
+                    <a href="#" class="reading-card">
+                        <h3>TryHackMe</h3>
+                        <p>一個對初學者非常友善的學習平台，透過引導式的學習路徑和房間，一步步教你駭客技術與防禦知識。</p>
+                    </a>
+                    <a href="#" class="reading-card">
+                        <h3>MITRE ATT&CK® Framework</h3>
+                        <p>一個基於真實世界觀察的全球性知識庫，收錄了駭客使用的各種戰術和技術，是了解攻擊者行為的權威指南。</p>
+                    </a>
+                </div>
+            </section>
+
+        </main>
+        
+        <!-- 換頁按鈕 -->
+        <div class="page-nav-buttons">
+            <button class="page-nav-button" id="prev-page-btn" aria-label="上一頁"><i class="fas fa-arrow-up"></i></button>
+            <button class="page-nav-button" id="next-page-btn" aria-label="下一頁"><i class="fas fa-arrow-down"></i></button>
+        </div>
+    </div>
+
+    <!-- 頁尾區塊 -->
+    <footer class="site-footer">
+        <div>
+            Copyright© 毛宇禾、賴永來、曾緯淳、李欣安<br>
+            臺北市數位實驗高級中等學校官網：<a href="https://tschool.tp.edu.tw/" target="_blank" rel="noopener noreferrer">https://tschool.tp.edu.tw/</a>
+        </div>
+    </footer>
+
+    <script>
+    // JavaScript 互動功能
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- 1. 元素選擇 ---
+        const navLinks = document.querySelectorAll('.side-nav a');
+        const pages = document.querySelectorAll('.page');
+        const sideNav = document.getElementById('side-nav');
+        const mainContent = document.getElementById('main-content');
+        const startLearningBtn = document.getElementById('start-learning-btn');
+        const prevPageBtn = document.getElementById('prev-page-btn');
+        const nextPageBtn = document.getElementById('next-page-btn');
+        
+        // 註解：定義頁面順序，方便鍵盤與按鈕導覽
+        const pageOrder = ['home', 'intro', 'types', 'application', 'ctf-challenge', 'writeup', 'reading'];
+        
+        // --- 2. 核心功能: 頁面切換 ---
+        function showPage(pageId, pushState = true) {
+            // 處理首頁特殊情況：隱藏/顯示導航欄
+            if (pageId === 'home') {
+                sideNav.style.display = 'none';
+            } else {
+                sideNav.style.display = 'block';
+            }
+
+            let foundPage = false;
+            pages.forEach(page => {
+                if (page.id === pageId) {
+                    page.classList.add('active');
+                    foundPage = true;
+                } else {
+                    page.classList.remove('active');
+                }
+            });
+
+            // 更新導航欄 active 狀態
+            navLinks.forEach(link => {
+                if (link.dataset.page === pageId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            // 確保每次換頁都滾動到頂部
+            window.scrollTo(0, 0);
+
+            // 儲存當前頁面到 LocalStorage
+            try {
+                localStorage.setItem('currentPage', pageId);
+            } catch (e) {
+                console.error("LocalStorage is not available.", e);
+            }
+            
+            // 調整導航欄高度
+            adjustNavHeight();
+        }
+        
+        // --- 3. 動態調整導航欄高度 ---
+        // 註解：此函數確保左側導航欄高度與右側內容同高
+        function adjustNavHeight() {
+            // 延遲執行以確保 DOM 已完全渲染
+            setTimeout(() => {
+                if (window.innerWidth > 1024) { // 只在桌面版執行
+                    const activePage = document.querySelector('.page.active');
+                    if (activePage && sideNav.style.display !== 'none') {
+                        const mainHeight = activePage.offsetHeight;
+                        sideNav.style.height = `${mainHeight}px`;
+                    }
+                } else {
+                     sideNav.style.height = 'auto'; // 手機版恢復自動高度
+                }
+            }, 50); // 短暫延遲
+        }
+
+        // --- 4. 頁籤 (Tabs) 與步驟 (Steps) 初始化 ---
+        function setupInteractiveContent(containerSelector, contentPrefix, buttonClass, contentClass, useNumericDataAttr = false) {
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+
+            const buttons = container.querySelectorAll(buttonClass);
+            const contents = container.querySelectorAll(contentClass);
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab || button.dataset.step;
+                    
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    contents.forEach(content => {
+                        const contentId = useNumericDataAttr ? content.dataset.step : content.id.replace(contentPrefix, '');
+                        if (contentId === tabId) {
+                            content.classList.add('active');
+                        } else {
+                            content.classList.remove('active');
+                        }
+                    });
+                    adjustNavHeight(); // 內容變化時，重新計算高度
+                });
+            });
+        }
+        
+        // --- 5. CTF 題目講解動態生成 ---
+        function setupWriteup() {
+            const stepsContentContainer = document.getElementById('writeup-steps-content');
+            const stepsNavContainer = document.getElementById('writeup-steps-nav');
+            if (!stepsContentContainer || !stepsNavContainer) return;
+
+            const stepsData = [
+                {
+                    title: "步驟一：步驟標題",
+                    content: "<p>內文 <code>指令</code></p> <img src='https://placehold.co/600x250/9dcad4/0c5663?text=開發者工具畫面' alt='開發者工具' style='max-width:100%; border-radius:8px; margin-top:1rem;'>",
+                },
+                {
+                    title: "步驟二：步驟標題",
+                    content: "<p>內文 <code>指令</code></p> <img src='https://placehold.co/600x250/9dcad4/0c5663?text=開發者工具畫面' alt='開發者工具' style='max-width:100%; border-radius:8px; margin-top:1rem;'>",
+                },
+                {
+                    title: "步驟三：步驟標題",
+                    content: "<p>內文 <code>指令</code></p> <img src='https://placehold.co/600x250/9dcad4/0c5663?text=開發者工具畫面' alt='開發者工具' style='max-width:100%; border-radius:8px; margin-top:1rem;'>",
+                },
+            ];
+
+            let contentHTML = '';
+            let navHTML = '';
+
+            stepsData.forEach((step, index) => {
+                const stepNum = index + 1;
+                const activeClass = (index === 0) ? 'active' : '';
+                contentHTML += `
+                    <div class="tab-content ${activeClass}" data-step="${stepNum}">
+                        <h3>${step.title}</h3>
+                        ${step.content}
+                    </div>`;
+                navHTML += `<button class="step-button ${activeClass}" data-step="${stepNum}">${stepNum}</button>`;
+            });
+
+            stepsContentContainer.innerHTML = contentHTML;
+            stepsNavContainer.innerHTML = navHTML;
+            
+            // 初始化步驟切換功能
+            setupInteractiveContent('#writeup', null, '.step-button', '.tab-content', true);
+        }
+
+        // --- 6. 事件監聽器設定 ---
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = link.dataset.page;
+                showPage(pageId);
+            });
+        });
+        
+        startLearningBtn.addEventListener('click', () => showPage('intro'));
+        
+        // 上下頁按鈕功能
+        function navigatePage(direction) {
+            const currentPageId = localStorage.getItem('currentPage') || 'home';
+            let currentIndex = pageOrder.indexOf(currentPageId);
+            
+            if (direction === 'next') {
+                currentIndex = (currentIndex + 1) % pageOrder.length;
+            } else {
+                currentIndex = (currentIndex - 1 + pageOrder.length) % pageOrder.length;
+            }
+            showPage(pageOrder[currentIndex]);
+        }
+        
+        nextPageBtn.addEventListener('click', () => navigatePage('next'));
+        prevPageBtn.addEventListener('click', () => navigatePage('prev'));
+
+        // 鍵盤導覽
+        document.addEventListener('keydown', (e) => {
+            // 註解：使用方向鍵換頁
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                navigatePage('next');
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                navigatePage('prev');
+            }
+            
+            // 註解：使用數字鍵切換分頁
+            const currentPageId = localStorage.getItem('currentPage') || 'home';
+            const currentPage = document.getElementById(currentPageId);
+            if (!currentPage) return;
+
+            const isNumericKey = !isNaN(parseInt(e.key)) && e.key >= '1' && e.key <= '9';
+            if (isNumericKey) {
+                // 檢查當前頁面是否有 tabs 或 steps
+                const interactiveButtons = currentPage.querySelectorAll('.tab-button, .step-button');
+                if (interactiveButtons.length > 0) {
+                    const targetIndex = parseInt(e.key) - 1;
+                    if (interactiveButtons[targetIndex]) {
+                        e.preventDefault();
+                        interactiveButtons[targetIndex].click();
+                    }
+                }
+            }
+        });
+        
+        // 監聽視窗大小變化，重新調整導航高度
+        const resizeObserver = new ResizeObserver(() => {
+            adjustNavHeight();
+        });
+        resizeObserver.observe(mainContent);
+
+        // --- 7. 頁面初始化 ---
+        // 讀取上次停留的頁面
+        const savedPage = localStorage.getItem('currentPage');
+        const initialPage = pageOrder.includes(savedPage) ? savedPage : 'home';
+        
+        // 初始化所有頁籤和步驟
+        setupInteractiveContent('#intro', 'intro-tab-', '.tab-button', '.tab-content');
+        setupInteractiveContent('#types', 'types-tab-', '.tab-button', '.tab-content');
+        setupInteractiveContent('#application', 'application-tab-', '.tab-button', '.tab-content');
+        setupWriteup();
+        
+        showPage(initialPage, false); // 初始載入，不推入歷史紀錄
+    });
+    </script>
+
+</body>
+</html>
