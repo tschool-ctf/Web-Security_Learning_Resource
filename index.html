@@ -942,17 +942,21 @@
 
             const stepsData = [
                 {
-                    title: "步驟一：步驟標題",
-                    content: "<p>內文 <code>指令</code></p> <img src='https://placehold.co/600x250/9dcad4/0c5663?text=開發者工具畫面' alt='開發者工具' style='max-width:100%; border-radius:8px; margin-top:1rem;'>",
+                    title: "步驟一：初始偵察",
+                    content: '<p>首先訪問目標網站，看到一個"逃離網路安全監獄"的主題頁面，提示我們被關在網路安全監獄中，需要運用技能逃脫。</p><p>按照慣例，我們首先檢查robots.txt文件以獲取更多訊息。</p><p>robots.txt 給了我們兩個重要的路徑線索：<code>/cookie_store</code> 和 <code>/flag</code>。</p>',
                 },
                 {
-                    title: "步驟二：步驟標題",
-                    content: "<p>內文 <code>指令</code></p> <img src='https://placehold.co/600x250/9dcad4/0c5663?text=開發者工具畫面' alt='開發者工具' style='max-width:100%; border-radius:8px; margin-top:1rem;'>",
+                    title: "步驟二：Cookie商店分析",
+                    content: '<p>訪問/cookie_store路徑，發現一個"秘密監獄餅乾店"</p><p>點擊其中一個餅乾後，使用開發者工具檢查Application標籤<p><p>可以看到cookies中有兩個值：<code>secret_cookie: guest</code> 和 <code>session: 一個長字串</code></p><p>當我們將 <code>secret_cookie</code> 的值從 <code>guest</code> 改為 <code>admin</code> 時，系統顯示了一個彈窗，提到"傳說中能激發逃脫能力的餅乾"，接著出現一個包含特殊密碼的提示。</p><p>輸入密碼後成功進入了"廚房後門"系統</p>',
                 },
                 {
-                    title: "步驟三：步驟標題",
-                    content: "<p>內文 <code>指令</code></p> <img src='https://placehold.co/600x250/9dcad4/0c5663?text=開發者工具畫面' alt='開發者工具' style='max-width:100%; border-radius:8px; margin-top:1rem;'>",
+                    title: "步驟三：路徑遍歷挑戰",
+                    content: '<p>在路徑選擇頁面中，我們需要在5個不同的路徑中選擇正確的一個。提示說"只有一道能夠通往自由，選擇錯誤可能會帶來致命的後果"。</p><p>最終選擇沒有在畫面上出現的隱藏路徑——路徑6（URL路徑改為 <code>/paths/6</code> ），成功進入下一關。</p>',
                 },
+                {
+                    title: "步驟四：門禁系統突破",
+                    content: '<p>進入後門後到達"最終門禁系統"，需要輸入正確的帳號和密碼來解鎖大門。</p><p>通過查看頁面源碼，發現了一些重要訊息：系統管理員登入入口、維護人員相關註解以及包含一個Base64編碼的字串</p><p>使用線上Base64解碼工具解碼該字串，得到登入帳號</p><p>在源碼中還發現了一串數字，將這些ASCII碼轉換為文字</p><p>當嘗試直接訪問 <code>/door/login</code> 時，頁面顯示"訪問被拒絕"，提示"你不是管理員！你的帳號和密碼正確，但你沒有管理員權限。只有管理員可以通過這道門。"</p><p>通過開發者工具修改cookie：將 <code>admin</code> 的值從 <code>False</code> 改為 <code>True</code> </p>',
+                }
             ];
 
             let contentHTML = '';
